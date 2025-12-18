@@ -262,12 +262,14 @@ def download_note(note_info, path, save_choice):
         f.write(json.dumps(note_info) + '\n')
     note_type = note_info['note_type']
     save_note_detail(note_info, save_path)
+    # 图集：仍然按配置下载图片
     if note_type == '图集' and save_choice in ['media', 'media-image', 'all']:
         for img_index, img_url in enumerate(note_info['image_list']):
             download_media(save_path, f'image_{img_index}', img_url, 'image')
+    # 视频：仅保存封面图片，不再下载视频文件，避免占用大量带宽和存储
     elif note_type == '视频' and save_choice in ['media', 'media-video', 'all']:
-        download_media(save_path, 'cover', note_info['video_cover'], 'image')
-        download_media(save_path, 'video', note_info['video_addr'], 'video')
+        if note_info.get('video_cover'):
+            download_media(save_path, 'cover', note_info['video_cover'], 'image')
     return save_path
 
 
